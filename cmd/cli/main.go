@@ -3,10 +3,36 @@ package main
 import (
 	"lakpahana/write-my-naita/internal/llm/gemini"
 	"log"
+	"os"
+	"regexp"
+
+	"github.com/joho/godotenv"
 )
 
+const projectDirName = "write-my-naita"
+
+// LoadEnv loads env vars from .env
+func LoadEnv() {
+	re := regexp.MustCompile(`^(.*` + projectDirName + `)`)
+	cwd, _ := os.Getwd()
+	rootPath := re.Find([]byte(cwd))
+
+	err := godotenv.Load(string(rootPath) + `/.env`)
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+		os.Exit(-1)
+	}
+}
+
 func main() {
-	GeminiClient, err := gemini.NewGeminiClient("SDAD")
+	LoadEnv()
+
+	apiKey := os.Getenv("API_KEY")
+	if apiKey == "" {
+		log.Fatalf("API_KEY environment variable not set")
+	}
+
+	GeminiClient, err := gemini.NewGeminiClient(apiKey)
 	if err != nil {
 		log.Fatalf("Error creating Gemini client: %v", err)
 	}
@@ -20,6 +46,5 @@ func main() {
 		log.Fatalf("Error generating weekly training report: %v", err)
 	}
 
-	log.Printf("report: %v", report)
-
+	log.Printf("report: %v", report.DailyProgress.Day1)
 }

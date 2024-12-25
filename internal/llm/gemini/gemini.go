@@ -32,7 +32,7 @@ func (g *GeminiClient) GenerateTimelineForAWeek(prompt string) (llm.WeeklyTraini
 	weeklyPrompt := fmt.Sprintf("%s\n%s\nGenerate a weekly training report for the prompt.", master, prompt)
 
 	model := g.client.GenerativeModel("gemini-1.5-flash")
-
+	model.ResponseMIMEType = "application/json"
 	response, err := model.GenerateContent(context.Background(), genai.Text(
 		weeklyPrompt,
 	))
@@ -43,11 +43,9 @@ func (g *GeminiClient) GenerateTimelineForAWeek(prompt string) (llm.WeeklyTraini
 	var report llm.WeeklyTrainingReport
 	part := response.Candidates[0].Content.Parts[0]
 	partToString := fmt.Sprintf("%v", part)
-	log.Printf("partToString: %v", partToString)
 	err = json.Unmarshal([]byte(partToString), &report)
 	if err != nil {
 		return llm.WeeklyTrainingReport{}, fmt.Errorf("failed to parse response into WeeklyTrainingReport: %w", err)
 	}
-	log.Printf("report: %v", report)
 	return report, nil
 }
