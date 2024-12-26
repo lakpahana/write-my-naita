@@ -38,7 +38,7 @@ func main() {
 
 	handler := corsMiddleware(http.DefaultServeMux)
 
-	fmt.Println("Server starting on :8080...")
+	fmt.Println("Server starting on :8080...\n Open http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", handler))
 }
 
