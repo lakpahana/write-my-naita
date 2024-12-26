@@ -8,11 +8,10 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
-	"regexp"
 	"strings"
 
 	"lakpahana/write-my-naita/internal/llm"
+	"lakpahana/write-my-naita/internal/path"
 )
 
 const resourceDocxFile = "resources/IT.docx"
@@ -20,9 +19,7 @@ const projectDirName = "write-my-naita"
 const modulePath = "internal/docx"
 
 func InsertWeeklyTimelineToDocx(report llm.WeeklyTrainingReport, outputDocx string) error {
-	re := regexp.MustCompile(`^(.*` + projectDirName + `)`)
-	cwd, _ := os.Getwd()
-	rootPath := re.Find([]byte(cwd))
+	rootPath := path.GetProjectRootPath()
 	resourceDocxFile := string(rootPath) + `/` + modulePath + `/` + resourceDocxFile
 	zipReader, err := zip.OpenReader(resourceDocxFile)
 	if err != nil {

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NAITA Report Generator</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #34495e;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        .generate-btn {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+
+        .download-btn {
+            background-color: #2ecc71;
+            color: white;
+            text-decoration: none;
+            display: none;
+        }
+
+        .download-btn:hover {
+            background-color: #27ae60;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            background-color: #fde8e8;
+            display: none;
+        }
+
+        .loading {
+            display: inline-block;
+            margin-right: 8px;
+            border: 2px solid #ffffff;
+            border-top: 2px solid transparent;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>NAITA Weekly Report Generator</h1>
+        <form id="reportForm">
+            <div class="form-group">
+                <label for="project">Project Details (Name, Tech)</label>
+                <input type="text" id="project" required>
+            </div>
+
+            <div class="form-group">
+                <label for="day1">Day 1 Progress</label>
+                <textarea id="day1" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="day2">Day 2 Progress</label>
+                <textarea id="day2" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="day3">Day 3 Progress</label>
+                <textarea id="day3" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="day4">Day 4 Progress</label>
+                <textarea id="day4" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="day5">Day 5 Progress</label>
+                <textarea id="day5" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="learnings">Key Learnings</label>
+                <textarea id="learnings" required></textarea>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" class="generate-btn" id="generateBtn">
+                    Generate Report
+                </button>
+                <a href="#" class="download-btn" id="downloadBtn">Download Report</a>
+            </div>
+
+            <div class="error-message" id="errorMessage"></div>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('reportForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const errorMessage = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                project: document.getElementById('project').value,
+                days: {
+                    1: document.getElementById('day1').value,
+                    2: document.getElementById('day2').value,
+                    3: document.getElementById('day3').value,
+                    4: document.getElementById('day4').value,
+                    5: document.getElementById('day5').value
+                },
+                learnings: document.getElementById('learnings').value
+            };
+
+            // Show loading state
+            generateBtn.disabled = true;
+            generateBtn.innerHTML = '<span class="loading"></span>Generating...';
+            downloadBtn.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:8080/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(formData)
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to generate report');
+                }
+
+                const data = await response.json();
+
+                // Show download button
+                downloadBtn.href = data.fileUrl;
+                downloadBtn.style.display = 'inline-block';
+
+                // Reset generate button
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = 'Generate Report';
+            } catch (err) {
+                // Show error
+                errorMessage.textContent = err.message;
+                errorMessage.style.display = 'block';
+
+                // Reset generate button
+                generateBtn.disabled = false;
+                generateBtn.innerHTML = 'Generate Report';
+            }
+        });
+    </script>
+</body>
+
+</html>
