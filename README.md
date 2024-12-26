@@ -44,7 +44,7 @@ The server will start on http://localhost:8080
 
 2. Open the frontend:
 
-Then visit http://localhost:3000
+Then visit http://localhost:8080
 
 If you love CLI like me, you can go to 
 ```bash
