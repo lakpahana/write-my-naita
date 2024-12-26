@@ -1,3 +1,5 @@
+![screely-1735244906949](https://github.com/user-attachments/assets/a70af9c5-46fa-4e28-85af-eacc49d34e92)
+
 # NAITA Report Generator
 
 A simple tool for generating weekly training reports for NAITA . This application allows trainees to input their daily progress and automatically generates a formatted report document.
