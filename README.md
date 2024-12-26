@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/869e26e9-2b89-4876-83f2-8d21f83f3cee)
+![Recording2024-12-27at02 19 14-ezgif com-optimize](https://github.com/user-attachments/assets/379acace-061a-420f-9c5a-c6121d17c860)
 
 # NAITA Report Generator
 
